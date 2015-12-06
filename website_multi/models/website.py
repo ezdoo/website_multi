@@ -19,17 +19,18 @@ class website(orm.Model):
         return res
 
     def _get_menu(self, cr, uid, ids, name, arg, context=None):
-        result = {}
+        res = {}
         menu_obj = self.pool['website.menu']
-
-        for website_id in ids:
-            menu_ids = menu_obj.search(cr, uid, [
+        for id in ids:
+            menu_domain = [
                 ('parent_id', '=', False),
-                ('website_id', '=', website_id),
-            ], order='id', context=context)
-            result[website_id] = menu_ids and menu_ids[0] or False
+                ('website_id', '=', id),
+            ]
+            menu_ids = menu_obj.search(cr, uid, menu_domain, order='id',
+                                       context=context)
+            res[id] = menu_ids and menu_ids[0] or False
 
-        return result
+        return res
 
     _columns = {
         'menu_id': fields.function(

@@ -82,8 +82,13 @@ class website(orm.Model):
 
     @openerp.tools.ormcache(skiparg=4)
     def _get_current_website_id(self, cr, uid, domain_name, context=None):
-        ids = self.search(cr, uid, [('name', '=', domain_name)], context=context)
-        return ids and ids[0] or None
+        website_id = 1
+        if request:
+            ids = self.search(cr, uid, [('name', '=', domain_name)],
+                              context=context)
+            if ids:
+                website_id = ids[0]
+        return website_id
 
     def get_current_website(self, cr, uid, context=None):
         domain_name = request.httprequest.environ.get('HTTP_HOST', '').split(':')[0]

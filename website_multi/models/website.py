@@ -91,10 +91,14 @@ class website(orm.Model):
         return website_id
 
     def get_current_website(self, cr, uid, context=None):
-        domain_name = request.httprequest.environ.get('HTTP_HOST', '').split(':')[0]
-        website_id = self._get_current_website_id(cr, uid, domain_name, context=context)
-        request.context['website_id'] = website_id or 1
-        return self.browse(cr, uid, website_id or 1, context=context)
+        domain_name = self.get_current_host_domain(cr, uid, context=context)
+        website_id = self._get_current_website_id(cr, uid, domain_name,
+                                                  context=context)
+        request.context['website_id'] = website_id
+        return self.browse(cr, uid, website_id, context=context)
+
+    def get_current_host_domain(self, cr, uid, context=None):
+        return request.httprequest.environ.get('HTTP_HOST', '').split(':')[0]
 
     def get_template(self, cr, uid, ids, template, context=None):
         if not isinstance(template, (int, long)) and '.' not in template:

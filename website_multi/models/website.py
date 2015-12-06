@@ -100,6 +100,12 @@ class website(orm.Model):
     def get_current_host_domain(self, cr, uid, context=None):
         return request.httprequest.environ.get('HTTP_HOST', '').split(':')[0]
 
+    def public_user(self, cr, uid, context=None):
+        return self.get_current_website(cr, uid, context=context).user_id
+
+    def public_user_id(self, cr, uid, context=None):
+        return self.public_user(cr, uid, context=context).id
+
     def get_template(self, cr, uid, ids, template, context=None):
         if not isinstance(template, (int, long)) and '.' not in template:
             template = 'website.%s' % template
@@ -115,11 +121,9 @@ class ir_http(osv.AbstractModel):
 
     def _auth_method_public(self):
         if not request.session.uid:
-            domain_name = request.httprequest.environ.get('HTTP_HOST', '').split(':')[0]
-            website_id = self.pool['website']._get_current_website_id(request.cr, openerp.SUPERUSER_ID, domain_name, context=request.context)
-            if website_id:
-                request.uid = self.pool['website'].browse(request.cr, openerp.SUPERUSER_ID, website_id, request.context).user_id.id
-            else:
-                dummy, request.uid = self.pool['ir.model.data'].get_object_reference(request.cr, openerp.SUPERUSER_ID, 'base', 'public_user')
+            ws = self.pool['website']
+            request.uid = ws.public_user_id(request.cr,
+                                            openerp.SUPERUSER_ID,
+                                            context=request.context)
         else:
             request.uid = request.session.uid

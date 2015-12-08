@@ -54,8 +54,6 @@ class view(osv.osv):
             xml_ids = self.search(cr, uid, domain, order='website_id', limit=1, context=context)
             if not xml_ids:
                 xml_id = self.pool['ir.model.data'].xmlid_to_res_id(cr, uid, xml_id, raise_if_not_found=True)
-                if self.read(cr, uid, xml_id, ['page'], context=context)['page']:
-                    raise ValueError('Invalid template id: %r' % (xml_id,))
             else:
                 xml_id = xml_ids[0]
         else:

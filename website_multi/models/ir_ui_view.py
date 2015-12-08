@@ -89,12 +89,12 @@ class view(osv.osv):
     def clear_cache(self):
         self._read_template.clear_cache(self)
         self.get_view_id.clear_cache(self)
-        
+
     def get_inheriting_views_arch(self, cr, uid, view_id, model, context=None):
         arch = super(view, self).get_inheriting_views_arch(cr, uid, view_id, model, context=context)
         if not context or not 'website_id' in context:
             return arch
-        
+
         view_ids = [v for _, v in arch]
         view_arch_to_add_per_key = {}
         keep_view_ids = []
@@ -102,7 +102,7 @@ class view(osv.osv):
             #case 1: there is no key, always keep the view
             if not view_rec.key:
                 keep_view_ids.append(view_rec.id)
-                
+
             #case 2: Correct website
             elif view_rec.website_id and view_rec.website_id.id == context['website_id']:
                 view_arch_to_add_per_key[view_rec.key] = (view_rec.website_id.id, view_rec.id)
@@ -116,7 +116,3 @@ class view(osv.osv):
         #Put all the view_id we keep together
         keep_view_ids.extend([view_id for _, view_id in view_arch_to_add_per_key.values()])
         return [(arch, view_id) for arch, view_id  in arch if view_id in keep_view_ids]
-      
-      
-
-            
